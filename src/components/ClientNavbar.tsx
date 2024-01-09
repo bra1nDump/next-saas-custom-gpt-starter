@@ -15,6 +15,7 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Avatar } from "@nextui-org/react";
 import { type User } from "next-auth";
+import Image from "next/image";
 
 export default function ClientNavbar(props: { prefetchedUser?: User }) {
   // get current pathname nextjs hook
@@ -51,15 +52,18 @@ export default function ClientNavbar(props: { prefetchedUser?: User }) {
           {user ? (
             <Dropdown>
               <DropdownTrigger>
-                <Avatar
-                  src={user.image ?? undefined}
-                  size="sm"
-                  radius="full"
-                  classNames={{
-                    // Removes the animation on the image - to further avoid flickering on page
-                    // reloads - the image will be cached by the browser anyway
-                    img: "!duration-0",
-                  }}
+                {/* Avatar it was not used because it causes flickering on route changes, we need some next magic to fix some next problems */}
+
+                <Image
+                  src={
+                    user.image ??
+                    // https://lucide.dev/icons/circle-user
+                    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtY2lyY2xlLXVzZXItcm91bmQiPjxwYXRoIGQ9Ik0xOCAyMGE2IDYgMCAwIDAtMTIgMCIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTAiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg=="
+                  }
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                  alt="user image"
                 />
               </DropdownTrigger>
               <DropdownMenu

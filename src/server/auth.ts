@@ -36,6 +36,7 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   debug: env.NODE_ENV === "development",
+  secret: env.AUTH_SECRET,
   pages: {
     signIn: "/account",
     signOut: "/account",

@@ -19,15 +19,18 @@
                 "uriFormat": "%s",
                 "action": "debugWithChrome"
             },
-            // FOr debugging nasty errors ...
-            "skipFiles": [
-                "!${workspaceRoot}/node_modules/**/*.js"
-            ],
-            "outFiles": [
-                "${workspaceFolder}/**/*.js",
-                "node_modules/**",
-                ".next/**"
-            ]
+        },
+        // The same thing as dev, but with the production build
+        {
+            "name": "Preview",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run preview",
+            "serverReadyAction": {
+                "pattern": "- Local:.+(https?://.+)",
+                "uriFormat": "%s",
+                "action": "debugWithChrome"
+            },
         }
     ]
 }
