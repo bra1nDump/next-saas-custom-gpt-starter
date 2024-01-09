@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -14,18 +14,9 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+// TODO: Steal these by pulling the datamodel using prisma from the database vercel subscription starter kit instead
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
+//////////////////// Authentication ////////////////////
 // Necessary for Next auth
 // Copy pasted from https://authjs.dev/reference/adapter/prisma
 model Account {
@@ -55,6 +46,7 @@ model Session {
 }
 
 model User {
+    // Boilerplate default schema required by PrismaAdapter for Auth.js
     id            String    @id @default(cuid())
     name          String?
     email         String?   @unique
@@ -62,7 +54,13 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+
+    // Stripe specific fields
+    stripeCustomerId String? @unique
+
+    stripePriceId                            String?
+    stripePlanActiveUntil                    DateTime?
+    stripeSubscriptionCancelationScheduledOn DateTime?
 }
 
 model VerificationToken {

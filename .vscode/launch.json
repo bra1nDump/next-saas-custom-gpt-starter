@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        // https://nextjs.org/docs/pages/building-your-application/configuring/debugging
+        {
+            "name": "Dev",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev",
+            // This will magically open a browser window for you once the server is ready
+            //
+            // WARNING: Google singup does not seem to work in a headless browser:
+            // Try using a different browser. If you’re already using a supported browser, you can try again to sign in.
+            "serverReadyAction": {
+                "pattern": "- Local:.+(https?://.+)",
+                "uriFormat": "%s",
+                "action": "debugWithChrome"
+            },
+        },
+        // The same thing as dev, but with the production build
+        {
+            "name": "Preview",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run preview",
+            "serverReadyAction": {
+                "pattern": "- Local:.+(https?://.+)",
+                "uriFormat": "%s",
+                "action": "debugWithChrome"
+            },
+        }
+    ]
+}

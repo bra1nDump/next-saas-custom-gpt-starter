@@ -1,6 +1,8 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
+import { Providers } from "./providers";
+import ServerNavbar from "~/components/ServerNavbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,7 +22,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>{children}</body>
+      <body className={`font-sans ${inter.variable} bg-default dark`}>
+        <Providers>
+          <div className="flex min-h-screen flex-col bg-background text-foreground">
+            <ServerNavbar />
+            {children}
+          </div>
+        </Providers>
+      </body>
     </html>
   );
 }
