@@ -2,7 +2,7 @@ import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import { Providers } from "./providers";
-import AppNavbar from "~/components/Navbar";
+import ServerNavbar from "~/components/ServerNavbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable} dark`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
-            <AppNavbar />
+            <ServerNavbar />
             {children}
           </div>
         </Providers>
