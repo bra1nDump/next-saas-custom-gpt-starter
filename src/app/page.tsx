@@ -1,37 +1,19 @@
+import { Button } from "@nextui-org/button";
 import Link from "next/link";
 
 export default function HomePage() {
+  // TODO: Factor this out into a separate component - Landing,
+  // and show it here conditionally - if user is signed in - show core product: search,
+  // if not - show landing
+  // The downside of this is this becoms a dynamic route and cant be statically generated - even
+  // though the landing is pretty much static
+  // - Lets not worry about it - even Next.js docs suggest to not worry about it https://nextjs.org/docs/app/building-your-application/rendering/server-components#dynamic-rendering
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
-          </Link>
-        </div>
-      </div>
+    <main className="flex h-full grow flex-col items-center justify-center space-y-8 bg-gradient-to-b from-[#2e026d] to-[#15162c] p-10 text-white">
+      <div>Why we do it</div>
+      <div>What we do</div>
+      <div>How we do it</div>
     </main>
   );
 }

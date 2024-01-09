@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -14,7 +14,9 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
+// TODO: Steal these by pulling the datamodel using prisma from the database vercel subscription starter kit instead
+
+model Subscription {
     id        Int      @id @default(autoincrement())
     name      String
     createdAt DateTime @default(now())
@@ -55,14 +57,14 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String         @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?        @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    Subscription  Subscription[]
 }
 
 model VerificationToken {

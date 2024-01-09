@@ -4,11 +4,16 @@ const config = {
   parserOptions: {
     project: true,
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ["@typescript-eslint", "unused-imports", "prettier"],
   extends: [
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
+
+    "plugin:prettier/recommended",
+
+    // This is a plugin splitting up long comments into multiple lines
+    "plugin:comment-length/recommended",
   ],
   rules: {
     // These opinionated rules are enabled in stylistic-type-checked above.
@@ -29,6 +34,19 @@ const config = {
       "error",
       {
         checksVoidReturn: { attributes: false },
+      },
+    ],
+
+    // This is a plugin splitting up long comments into multiple lines
+    "comment-length/limit-single-line-comments": [
+      "warn",
+      {
+        mode: "overflow-only",
+        maxLength: 100,
+        logicalWrap: true,
+        ignoreUrls: true,
+        ignoreCommentsWithCode: true,
+        tabSize: 2,
       },
     ],
   },
