@@ -1,0 +1,1 @@
+stripe fixtures stripe-fixtures.json

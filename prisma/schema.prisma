@@ -16,18 +16,7 @@ datasource db {
 
 // TODO: Steal these by pulling the datamodel using prisma from the database vercel subscription starter kit instead
 
-model Subscription {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
+//////////////////// Authentication ////////////////////
 // Necessary for Next auth
 // Copy pasted from https://authjs.dev/reference/adapter/prisma
 model Account {
@@ -64,6 +53,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    Customer      Customer[]
     Subscription  Subscription[]
 }
 
@@ -73,4 +63,81 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+//////////////////// Subscriptions synchronized with Stripe ////////////////////
+// TRANSLATED FROM https://github.com/vercel/nextjs-subscription-payments/blob/main/supabase/migrations/20230530034630_init.sql
+model Customer {
+    id               String @id @default(cuid())
+    stripeCustomerId String @unique
+    user             User   @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Product {
+    id          String  @id
+    active      Boolean
+    name        String
+    description String?
+    image       String?
+    metadata    Json
+    Price       Price[]
+}
+
+model Price {
+    id              String              @id
+    productId       String
+    active          Boolean
+    description     String?
+    unitAmount      Int
+    currency        String
+    type            PricingType
+    interval        PricingPlanInterval
+    intervalCount   Int
+    trialPeriodDays Int?
+    metadata        Json
+    product         Product             @relation(fields: [productId], references: [id])
+    Subscription    Subscription[]
+}
+
+enum PricingType {
+    oneTime
+    recurring
+}
+
+enum PricingPlanInterval {
+    day
+    week
+    month
+    year
+}
+
+model Subscription {
+    id                 String             @id
+    userId             String
+    status             SubscriptionStatus
+    metadata           Json
+    priceId            String
+    quantity           Int
+    cancelAtPeriodEnd  Boolean
+    created            DateTime           @default(now())
+    currentPeriodStart DateTime           @default(now())
+    currentPeriodEnd   DateTime           @default(now())
+    endedAt            DateTime?
+    cancelAt           DateTime?
+    canceledAt         DateTime?
+    trialStart         DateTime?
+    trialEnd           DateTime?
+    user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    price              Price              @relation(fields: [priceId], references: [id])
+}
+
+enum SubscriptionStatus {
+    trialing
+    active
+    canceled
+    incomplete
+    incompleteExpired
+    pastDue
+    unpaid
+    paused
 }
