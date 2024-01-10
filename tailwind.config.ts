@@ -16,5 +16,18 @@ export default {
     },
   },
   darkMode: "class",
-  plugins: [nextui()],
+  plugins: [
+    nextui({
+      // Customize https://nextui.org/docs/customization/customize-theme
+      themes: {
+        dark: {
+          colors: {
+            primary: {
+              DEFAULT: "white",
+            },
+          },
+        },
+      },
+    }),
+  ],
 } satisfies Config;

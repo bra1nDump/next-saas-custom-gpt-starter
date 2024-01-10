@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import { Avatar } from "@nextui-org/react";
 import { type User } from "next-auth";
 import Image from "next/image";
+import useScroll from "~/hooks/use-scroll";
 
 export default function ClientNavbar(props: { prefetchedUser?: User }) {
   // get current pathname nextjs hook
@@ -27,8 +28,15 @@ export default function ClientNavbar(props: { prefetchedUser?: User }) {
   // Idea: If useSession cashed the user, we would not have to do this workaround
   const user = useSession().data?.user ?? props.prefetchedUser;
 
+  const scrolled = useScroll(50);
+
   return (
-    <Navbar maxWidth="full" className="justify-between">
+    <Navbar
+      maxWidth="full"
+      className={`justify-between ${
+        scrolled ? "border-b border-b-divider" : "bg-background/0"
+      }`}
+    >
       <NavbarContent>
         <NavbarItem>
           {/* <AcmeLogo /> */}
@@ -68,7 +76,14 @@ export default function ClientNavbar(props: { prefetchedUser?: User }) {
               </DropdownTrigger>
               <DropdownMenu
                 aria-label="Dynamic Actions"
-                items={[{ label: "Sign Out", onClick: () => void signOut() }]}
+                items={[
+                  {
+                    label: "Sign Out",
+                    onClick: () => {
+                      void signOut();
+                    },
+                  },
+                ]}
               >
                 {(item) => (
                   <DropdownItem

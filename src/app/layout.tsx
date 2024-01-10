@@ -22,9 +22,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable} dark`}>
+      <body className={`font-sans ${inter.variable} bg-default dark`}>
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-screen flex-col bg-background text-foreground">
             <ServerNavbar />
             {children}
           </div>
