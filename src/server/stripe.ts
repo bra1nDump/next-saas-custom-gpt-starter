@@ -8,6 +8,17 @@ export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
+/**
+ * Overview:
+ * - Product IDs in env
+ * - Create pricing plans from static data
+ *
+ * - When checking if a user is on paid plan or not - simply call an API on the
+ * backend :D
+ * - [optional] Maybe to simplify querying?
+ *     When a user signs up, create a customer in stripe
+ */
+
 export interface ProductOfferingView {
   stripeProductId?: string;
   title: string;

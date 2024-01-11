@@ -1,90 +1,98 @@
-"use client";
-
+// app/pricing.page.tsx
+import { usePathname } from "next/navigation";
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Button,
-  Divider,
-} from "@nextui-org/react";
-import { Check, X } from "lucide-react";
+import { PricingAndBilling } from "~/components/PricingAndBilling";
+import { getServerAuthSession } from "~/server/auth";
 import { type ProductOfferingView } from "~/server/stripe";
+import { getUserInfo, getOrCreateCustomerId } from "~/server/user";
 
-// TODO: Make this into a component and inject the initial state from the server side page (get
-// user, plan, all plans)
-export default function PricingPage(props: {
-  allProducts: ProductOfferingView[];
-  currentStripeProductId?: string;
+// https://nextjs.org/docs/app/api-reference/file-conventions/page#searchparams-optional
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams: object;
 }) {
-  // Possible states for each plan card
-  // - we are signed in and don't have any plan (we are on the free plan -> subscribe button)
-  // - we are signed in and have this plan (current plan pill + manage subscription button)
-  // - we are signed in on a different plan (upgrade button)
-  // - we are not signed in -> try
+  const session = await getServerAuthSession();
+  const user = session?.user;
+
+  const allProducts = [];
+  let currentStripeProductId = null;
+
+  try {
+    // Fetch the list of all Stripe products & prices with caching
+    const pricesResponse = await fetch(`https://api.stripe.com/v1/prices`, {
+      headers: {
+        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+      },
+      next: {
+        revalidate: 3600, // Cache for 1 hour
+      },
+    });
+
+    if (!pricesResponse.ok) {
+      throw new Error("Failed to fetch Stripe prices");
+    }
+
+    const pricingData = [
+      {
+        title: "Starter",
+        price: 0,
+        stripeProductId: undefined,
+        benefits: ["1 user", "1 GB storage", "Email support"],
+        limitation: ["Limited to 5 projects"],
+      },
+      {
+        title: "Pro",
+        price: 10,
+        benefits: ["5 users", "10 GB storage", "Priority email support"],
+        limitation: ["Limited to 5 projects"],
+      },
+      {
+        title: "Enterprise",
+        price: 100,
+        benefits: [
+          "Unlimited users",
+          "100 GB storage",
+          "Phone and email support",
+        ],
+        limitation: ["Limited to 5 projects"],
+      },
+    ] satisfies ProductOfferingView[];
+
+    // If user is logged in, handle customer and subscriptions
+    if (user) {
+      if (user.id)
+        const subscriptionsResponse = await fetch(
+          `https://api.stripe.com/v1/subscriptions?customer=${customerId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+            },
+            next: {
+              revalidate: 3600, // Invalidate and revalidate when user state changes
+            },
+          },
+        );
+
+      if (!subscriptionsResponse.ok) {
+        throw new Error("Failed to fetch Stripe subscriptions");
+      }
+
+      const { data: subscriptionsData } = await subscriptionsResponse.json();
+      const activeSubscription = subscriptionsData[0]; // Assuming one active subscription
+
+      if (activeSubscription) {
+        currentStripeProductId = activeSubscription.items.data[0].price.product;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to load pricing data", error);
+  }
 
   return (
-    <div className="container mx-auto flex max-w-screen-lg flex-col px-4 text-center">
-      <h2 className="my-10 text-3xl md:text-5xl">Start at full speed !</h2>
-
-      <div className="grid w-full justify-items-center gap-5 md:grid-cols-3">
-        {props.allProducts.map((product) => (
-          <Card
-            key={product.title}
-            className="flex min-h-[150px] w-full max-w-[500px] flex-col border border-divider"
-          >
-            <CardHeader className="flex flex-col items-start gap-4 p-6 font-normal">
-              {/* Plan title: STARTER / PRO / ENTERPRISE */}
-              <p className="flex text-sm uppercase tracking-wider text-foreground-400">
-                {product.title}
-              </p>
-              {/* Price */}
-              <div className="flex items-baseline gap-2">
-                <p className="flex text-left text-3xl leading-6">
-                  ${product.price}
-                </p>
-                <span>/mo</span>
-              </div>
-            </CardHeader>
-
-            <Divider />
-
-            <CardBody className="p-6">
-              {/* Benefits */}
-              {product.benefits.map((feature) => (
-                <div key={feature} className="flex items-center gap-2">
-                  <Check size={16} />
-                  <p>{feature}</p>
-                </div>
-              ))}
-
-              {/* Limitations */}
-              {product.limitation.map((limit) => (
-                <div
-                  key={limit}
-                  className="flex items-center gap-2 text-foreground-400"
-                >
-                  <X size={16} />
-                  <p>{limit}</p>
-                </div>
-              ))}
-            </CardBody>
-
-            <CardFooter className="px-6 pb-6 pt-0">
-              <Button
-                color="secondary"
-                className="w-full"
-                onPress={() => {
-                  console.log("TODO: subscribe to plan");
-                }}
-              >
-                Subscribe
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    </div>
+    <PricingAndBilling
+      allProducts={allProducts}
+      currentStripeProductId={currentStripeProductId}
+    />
   );
 }

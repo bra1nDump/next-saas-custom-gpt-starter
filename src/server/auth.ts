@@ -25,6 +25,7 @@ declare module "next-auth" {
   // `useSession`.
   interface User {
     id: string;
+    stripeCustomerId?: string;
   }
 }
 
@@ -56,12 +57,18 @@ export const authOptions: NextAuthOptions = {
      * the jwt callback, you have to explicitly forward it here to make it
      * available to the client.
      */
-    session: ({ session, user }) => {
+    async session({ session, user }) {
+      // TODO: Optimize - maybe we don't need to find the user here?
+      const dbUser = await db.user.findUnique({
+        where: { id: user.id },
+      });
+
       return {
         ...session,
         user: {
           ...session.user,
           id: user.id,
+          stripeCustomerId: dbUser?.stripeCustomerId ?? undefined,
         },
       };
     },
