@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Make this a js script - otherwise its not cross platform
+
 CONTAINER_NAME="local-postgres-your-app-name"
 POSTGRES_PASSWORD="mysecretpassword"  # Change this to your desired password
 POSTGRES_IMAGE="postgres"

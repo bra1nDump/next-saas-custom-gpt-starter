@@ -8,7 +8,95 @@ export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
+export interface ProductOfferingView {
+  stripeProductId?: string;
+  title: string;
+  price: number;
+
+  benefits: string[];
+  limitation: string[];
+}
+
+// Create a function to return an active subscription for this user
+export async function findStripeProductIdForActiveSubscription(
+  userId: string,
+): Promise<string | undefined> {
+  const customer = await db.customer.findUnique({
+    where: { id: userId },
+  });
+  if (!customer) return undefined;
+
+  // It might be a bad idea to query the database, probably better to go directly to stripe.
+  // More code to write, we can cach it with fetch on Vercel. Won a user clicks cancel,
+  // we can set a flag to invalidate the cache. Or we can use the webhook to invalidate the cache.
+  // Damn it seems like a waste of lines of code to do this.
+  // Shit
+  const subscription = await db.subscription.findFirst({
+    where: {
+      user: { id: userId },
+      status: { in: ["active", "trialing"] },
+    },
+    orderBy: { created: "desc" },
+    include: { price: true },
+  });
+
+  return subscription?.price?.productId;
+}
+
+/**
+ * Currently only works for monthly payments, but can easily be extended.
+ * In addition to products found on stripe, will also include a free product.
+ */
+export async function allMonthlyProductOfferings(): Promise<
+  ProductOfferingView[]
+> {
+  const defaultFreeProduct = {
+    title: "Free",
+    price: 0,
+    benefits: ["Free"],
+    limitation: ["No support"],
+  };
+
+  const paidForProducts = await db.product.findMany({
+    include: {
+      Price: true,
+    },
+  });
+
+  const paidForProductsViews = paidForProducts.map((product) => {
+    const price = product.Price.filter(
+      (price) =>
+        price.type === "recurring" &&
+        price.active &&
+        price.interval === "month",
+    )[0];
+
+    if (!price) throw new Error("No price found");
+
+    // TODO: Add a list of benefits here. Probably even better is to move this product view to the
+    // UI layer.
+
+    return {
+      stripeProductId: product.id,
+      title: product.name,
+      price: price.unitAmount / 100,
+      benefits: ["Support"],
+      limitation: ["No refunds"],
+    };
+  });
+
+  if (paidForProductsViews.length === 0) {
+    throw new Error(
+      "No paid for products found, have you run the stripe fixtures script?",
+    );
+  }
+
+  return [defaultFreeProduct, ...paidForProductsViews];
+}
+
 // TRANSLATED FROM https://github.com/vercel/nextjs-subscription-payments/blob/main/utils/supabase-admin.ts
+
+// TODO: If the webhook is missed, one can manually trigger it - https://stackoverflow.com/questions/54349378/how-to-make-stripe-manually-resend-an-event-to-webhook
 
 export async function upsertProductRecord(product: Stripe.Product) {
   const productData = {
@@ -18,7 +106,7 @@ export async function upsertProductRecord(product: Stripe.Product) {
     description: product.description ?? null,
     image: product.images?.[0] ?? null,
     metadata: product.metadata,
-  };
+  } satisfies Prisma.ProductCreateInput;
 
   try {
     await db.product.upsert({
