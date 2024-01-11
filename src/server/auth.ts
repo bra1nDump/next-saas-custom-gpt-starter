@@ -26,6 +26,7 @@ declare module "next-auth" {
   interface User {
     id: string;
     stripeCustomerId?: string;
+    lastKnownSubscribedProductId?: string;
   }
 }
 
@@ -69,6 +70,8 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: user.id,
           stripeCustomerId: dbUser?.stripeCustomerId ?? undefined,
+          lastKnownSubscribedProductId:
+            dbUser?.lastKnownSubscribedProductId ?? undefined,
         },
       };
     },

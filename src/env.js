@@ -34,6 +34,10 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: z.string(),
 
     STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
+
+    STRIPE_PRODUCT_ID_PLUS: z.string(),
+    STRIPE_PRODUCT_ID_PRO: z.string(),
   },
 
   /**
@@ -61,6 +65,10 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
 
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+
+    STRIPE_PRODUCT_ID_PLUS: process.env.STRIPE_PRODUCT_ID_PLUS,
+    STRIPE_PRODUCT_ID_PRO: process.env.STRIPE_PRODUCT_ID_PRO,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
