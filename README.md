@@ -56,4 +56,4 @@ TODO: Make sure the app works fine without stripe and hints that its not setup p
 
 ## Making changes to the API
 - Locate file using OpenAPIRouter (this is what creates the /render route and openapi.json route)
-- Locate the Render.ts file - handles the route itself, and also provides schema to create openapi.json
+- Locate the Render.ts file - handles the route itself, and also provides schema to create openapi.json 
